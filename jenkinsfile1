@@ -80,40 +80,24 @@ pipeline {
             }
         }
         stage('Login to Dockerhub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'Dockerlogin-user1', passwordVariable: 'Dockerpassword', usernameVariable: 'Dockerlogin')]) {
-    // some block
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'Dockerlogin-user1', passwordVariable: 'Dockerpassword', usernameVariable: 'Dockerlogin')]) {
+
 }
-                    sh 'docker login -u sneh454 ${env.Dockerlogin} -p ${env.Dockerpassword}'
-                }
+        sh 'docker login -u ${Dockerlogin} -p ${Dockerpassword}'
+                                                                    }
+                                }
             }
-        } 
-        stage('Push the Docker image') {
-            steps {
-                sh 'docker push sneh454/insurance-project:5.0'
+    stage('Push the Docker image') {
+      steps {
+        sh 'docker push sneh454/insurance-project:5.0'
+                                }
             }
-        }
-        stage('Ansible config and Deployment') {
-            steps {
-                ansiblePlaybook credentialsId: 'ansible-ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible.yml', vaultTmpPath: ''
+    stage('Ansbile config and Deployment') {
+      steps {
+        ansiblePlaybook credentialsId: 'ansible-ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible.yml', vaultTmpPath: ''
+                               }
             }
-        }
-    }
-}
- usernameVariable: 'Dockerlogin')]) {
-                sh 'docker login -u sneh454 ${env.Dockerlogin} -p ${env.Dockerpassword}
-                }
-            }
-        } 
-        stage('Push the Docker image') {
-            steps {
-                sh 'docker push sneh454/insurance-project:5.0'
-            }
-        }
-        stage('Ansible config and Deployment') {
-            steps {
-                ansiblePlaybook credentialsId: 'ansible-ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible.yml', vaultTmpPath: ''
-            }
-        }
+
     }
 }
