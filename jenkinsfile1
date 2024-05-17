@@ -1,0 +1,22 @@
+pipeline {
+  agent any
+
+    tools{
+      maven 'M2_HOME'
+      }
+
+   stages {
+    stage('Git checkout') {
+      steps {
+         echo 'This is for cloning the gitrepo'
+         git branch: 'master', url: 'git 'https://github.com/slimkleed/star-agile-insurance-project.git'
+             }
+    }
+    stage('Package') {
+      steps {
+         echo 'This will create a package using maven'
+         sh 'mvn package'
+              }
+            }
+        }
+ }
