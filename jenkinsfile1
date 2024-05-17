@@ -18,18 +18,42 @@ pipeline {
                 sh 'mvn package'
             }
         }
-    stage('Publish the HTML Reports') {
-      steps {
-        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/insurance_project/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+        stage('Publish the HTML Reports') {
+            steps {
+                publishHTML(
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: '/var/lib/jenkins/workspace/insurance_project/target/surefire-reports',
+                    reportFiles: 'index.html',
+                    reportName: 'HTML Report',
+                    reportTitles: '',
+                    useWrapperFileDirectly: true
+                )
             }
-    }
-   stage('Create a Docker image from the Package') {
-      steps {
-        echo 'creating a docker image from the package'
-        sh 'docker build -t slimkleed/star-agile-insurance-project:01 .'   
-           }
         }
-      }
- }
-
-
+        stage('Create a Docker image from the Package') {
+            steps {
+                echo 'Creating a Docker image from the package'
+                sh 'docker build -t slimkleed/star-agile-insurance-project:01 .'
+            }
+        }
+        stage('Login to Dockerhub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'Dockerlogin-user', passwordVariable: 'Dockerpassword', usernameVariable: 'Dockerlogin')]) {
+                sh 'docker login -u sneh454 ${env.Dockerlogin} -p ${env.Dockerpassword}
+                }
+            }
+        } 
+        stage('Push the Docker image') {
+            steps {
+                sh 'docker push sneh454/insurance-project:5.0'
+            }
+        }
+        stage('Ansible config and Deployment') {
+            steps {
+                ansiblePlaybook credentialsId: 'ansible-ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible.yml', vaultTmpPath: ''
+            }
+        }
+    }
+}
